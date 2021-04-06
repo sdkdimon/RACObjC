@@ -1,0 +1,6 @@
+framework module Pods_RACObjC_macOSTests {
+  umbrella header "Pods-RACObjC-macOSTests-umbrella.h"
+
+  export *
+  module * { export * }
+}

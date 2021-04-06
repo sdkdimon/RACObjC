@@ -1,0 +1,3 @@
+${PODS_ROOT}/Target Support Files/Pods-RACObjC-tvOSTests/Pods-RACObjC-tvOSTests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/Nimble-tvOS/Nimble.framework
+${BUILT_PRODUCTS_DIR}/Quick-tvOS/Quick.framework
