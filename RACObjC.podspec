@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
 
   s.name         = "RACObjC"
-  s.version      = "3.2.0"
+  s.version      = "3.2.1"
   s.summary      = "The 2.x ReactiveCocoa Objective-C API: Streams of values over time"
 
   s.description  = <<-DESC.strip_heredoc
@@ -20,10 +20,10 @@ Pod::Spec.new do |s|
  
   s.source = { git: "https://github.com/sdkdimon/RACObjC.git", tag: s.version }
   
-  s.ios.deployment_target     = "9.0"
-  s.osx.deployment_target     = "10.9"
+  s.ios.deployment_target     = "12.0"
+  s.osx.deployment_target     = "10.13"
   s.watchos.deployment_target = "2.0"
-  s.tvos.deployment_target    = "9.0"
+  s.tvos.deployment_target    = "12.0"
   
   
   s.subspec 'Core' do |core|
@@ -41,9 +41,9 @@ Pod::Spec.new do |s|
   
   s.subspec 'UI' do |ui|
     
-    ui.ios.deployment_target  = "9.0"
-    ui.osx.deployment_target  = "10.9"
-    ui.tvos.deployment_target = "9.0"
+    ui.ios.deployment_target  = "12.0"
+    ui.osx.deployment_target  = "10.13"
+    ui.tvos.deployment_target = "12.0"
     
     ui.dependency 'RACObjC/Core'
     
