@@ -59,7 +59,7 @@ static NSString * const RACKVOWrapperCollectionExamplesKeyPath = @"RACKVOWrapper
 
 QuickConfigurationBegin(RACKVOWrapperExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACKVOWrapperExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block NSObject *target = nil;
 		__block NSString *keyPath = nil;

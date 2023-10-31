@@ -25,7 +25,7 @@ NSString * const RACSubscriberExampleSuccessBlock = @"RACSubscriberExampleSucces
 
 QuickConfigurationBegin(RACSubscriberExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACSubscriberExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block NSArray * (^valuesReceived)(void);
 		__block NSError * (^errorReceived)(void);

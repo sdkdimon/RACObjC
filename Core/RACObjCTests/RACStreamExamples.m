@@ -22,7 +22,7 @@ NSString * const RACStreamExamplesVerifyValuesBlock = @"RACStreamExamplesVerifyV
 
 QuickConfigurationBegin(RACStreamExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACStreamExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block Class streamClass;
 		__block void (^verifyValues)(RACStream *, NSArray *);

@@ -21,7 +21,7 @@ NSString * const RACSequenceExampleExpectedValues = @"RACSequenceExampleExpected
 
 QuickConfigurationBegin(RACSequenceExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACSequenceExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block RACSequence *sequence;
 		__block NSArray *values;
