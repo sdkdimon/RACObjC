@@ -43,7 +43,7 @@ static NSString * const RACSignalMaxConcurrent = @"RACSignalMaxConcurrent";
 
 QuickConfigurationBegin(mergeConcurrentCompletionName)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACSignalMergeConcurrentCompletionExampleGroup, ^(QCKDSLSharedExampleContext exampleContext) {
 		qck_it(@"should complete only after the source and all its signals have completed", ^{
 			RACSubject *subject1 = [RACSubject subject];

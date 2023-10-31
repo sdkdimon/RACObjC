@@ -24,7 +24,7 @@ NSString * const RACPropertySubscribingExamplesSetupBlock = @"RACPropertySubscri
 
 QuickConfigurationBegin(NSObjectRACPropertySubscribingExamples)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACPropertySubscribingExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block RACSignal *(^signalBlock)(RACTestObject *object, NSString *keyPath, id observer);
 

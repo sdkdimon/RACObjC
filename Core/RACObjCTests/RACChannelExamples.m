@@ -29,7 +29,7 @@ NSString * const RACViewChannelExampleSetViewValueBlock = @"RACViewChannelExampl
 
 QuickConfigurationBegin(RACChannelExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACChannelExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block RACChannel * (^getChannel)(void);
 		__block RACChannel *channel;

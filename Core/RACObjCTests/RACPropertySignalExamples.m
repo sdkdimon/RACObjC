@@ -24,7 +24,7 @@ NSString * const RACPropertySignalExamplesSetupBlock = @"RACPropertySignalExampl
 
 QuickConfigurationBegin(RACPropertySignalExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACPropertySignalExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block RACTestObject *testObject = nil;
 		__block void (^setupBlock)(RACTestObject *, NSString *keyPath, id nilValue, RACSignal *);

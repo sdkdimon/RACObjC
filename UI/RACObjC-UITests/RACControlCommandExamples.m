@@ -31,7 +31,7 @@ NSString * const RACControlCommandExampleActivateBlock = @"RACControlCommandExam
 
 QuickConfigurationBegin(RACControlCommandExampleGroups)
 
-+ (void)configure:(Configuration *)configuration {
++ (void)configure:(QCKConfiguration *)configuration {
 	sharedExamples(RACControlCommandExamples, ^(QCKDSLSharedExampleContext exampleContext) {
 		__block id control;
 		__block void (^activate)(id);

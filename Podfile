@@ -3,14 +3,14 @@ workspace 'RACObjC.xcworkspace'
 use_frameworks!
 
 def test_pods
-  pod 'Quick', '3.1.2'
-  pod 'Nimble', '9.0.0'
+  pod 'Quick'
+  pod 'Nimble'
 end
 
 target 'RACObjC-iOSTests' do
   project 'Core/RACObjC.xcodeproj'
-  platform :ios, '9.0'
-  test_pods  
+  platform :ios, '12.0'
+  test_pods
 end
 
 target 'RACObjC-macOSTests' do
@@ -26,13 +26,13 @@ target 'RACObjC-tvOSTests' do
 end
 
 target 'RACObjC-UI-iOSTests' do
-    project 'UIKit/RACObjC-UI.xcodeproj'
-    platform :ios, '9.0'
-    test_pods 
+    project 'UI/RACObjC-UI.xcodeproj'
+    platform :ios, '12.0'
+    test_pods
 end
 
 target 'RACObjC-UI-AppKitTests' do
-    project 'UIKit/RACObjC-UI.xcodeproj'
+    project 'UI/RACObjC-UI.xcodeproj'
     platform :osx, '10.15'
     test_pods
 end
