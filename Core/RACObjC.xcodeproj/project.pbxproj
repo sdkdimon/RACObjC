@@ -616,6 +616,7 @@
 		0459E2F88E87D8CC31818AF2 /* Pods-RACObjC-iOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-iOSTests.release.xcconfig"; path = "Target Support Files/Pods-RACObjC-iOSTests/Pods-RACObjC-iOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		28A70CF2051918B8955E2DEE /* Pods-RACObjC-macOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-macOSTests.release.xcconfig"; path = "Target Support Files/Pods-RACObjC-macOSTests/Pods-RACObjC-macOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		3EFC4D08D2C421D33D8E3597 /* Pods_RACObjC_iOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RACObjC_iOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		8A402A842AF2307A00043C83 /* RACObjC.modulemap */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; path = RACObjC.modulemap; sourceTree = "<group>"; };
 		8A47977826163E9F0083A004 /* NSURLConnection+RACSupport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "NSURLConnection+RACSupport.h"; sourceTree = "<group>"; };
 		8A47977926163E9F0083A004 /* NSURLConnection+RACSupport.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "NSURLConnection+RACSupport.m"; sourceTree = "<group>"; };
 		8A47978626163FC30083A004 /* test-data.json */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.json; path = "test-data.json"; sourceTree = "<group>"; };
@@ -939,6 +940,7 @@
 			children = (
 				8ABFA24C2615E1E200AF0F57 /* Classes */,
 				8ABFA2332615E1CD00AF0F57 /* RACObjC.h */,
+				8A402A842AF2307A00043C83 /* RACObjC.modulemap */,
 				8ABFA2342615E1CD00AF0F57 /* Info.plist */,
 			);
 			path = RACObjC;
@@ -2246,6 +2248,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2276,6 +2279,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2403,7 +2407,7 @@
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TVOS_DEPLOYMENT_TARGET = 9.0;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
 				WATCHOS_DEPLOYMENT_TARGET = 2.0;
@@ -2462,7 +2466,7 @@
 				MTL_FAST_MATH = YES;
 				SDKROOT = iphoneos;
 				SWIFT_OBJC_BRIDGING_HEADER = "";
-				TVOS_DEPLOYMENT_TARGET = 9.0;
+				TVOS_DEPLOYMENT_TARGET = 12.0;
 				VALIDATE_PRODUCT = YES;
 				VERSIONING_SYSTEM = "apple-generic";
 				VERSION_INFO_PREFIX = "";
@@ -2489,6 +2493,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2521,6 +2526,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2610,6 +2616,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -2639,6 +2646,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = org.sdkdimon.RACObjC;
 				PRODUCT_NAME = RACObjC;
 				PROVISIONING_PROFILE_SPECIFIER = "";

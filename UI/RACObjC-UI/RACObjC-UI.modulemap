@@ -1,0 +1,4 @@
+framework module RACObjC {
+    umbrella header "RACObjCUI.h"
+    export *
+}
