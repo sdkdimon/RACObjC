@@ -119,6 +119,7 @@
 /* Begin PBXFileReference section */
 		24BE01D945943E02106C3995 /* Pods-RACObjC-UI-AppKitTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-UI-AppKitTests.release.xcconfig"; path = "Target Support Files/Pods-RACObjC-UI-AppKitTests/Pods-RACObjC-UI-AppKitTests.release.xcconfig"; sourceTree = "<group>"; };
 		36606D33C04BF8C91FD0A89A /* Pods-RACObjC-UI-iOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-UI-iOSTests.release.xcconfig"; path = "Target Support Files/Pods-RACObjC-UI-iOSTests/Pods-RACObjC-UI-iOSTests.release.xcconfig"; sourceTree = "<group>"; };
+		8A402A852AF230FC00043C83 /* RACObjC-UI.modulemap */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = "sourcecode.module-map"; path = "RACObjC-UI.modulemap"; sourceTree = "<group>"; };
 		8A47974926163D230083A004 /* UIAlertViewRACSupportSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIAlertViewRACSupportSpec.m; sourceTree = "<group>"; };
 		8A47974A26163D230083A004 /* UIBarButtonItemRACSupportSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIBarButtonItemRACSupportSpec.m; sourceTree = "<group>"; };
 		8A47974B26163D230083A004 /* UIImagePickerControllerRACSupportSpec.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = UIImagePickerControllerRACSupportSpec.m; sourceTree = "<group>"; };
@@ -261,6 +262,7 @@
 			children = (
 				8ABFA3D12615E57900AF0F57 /* Classes */,
 				8ABFA3B82615E55800AF0F57 /* RACObjCUI.h */,
+				8A402A852AF230FC00043C83 /* RACObjC-UI.modulemap */,
 				8ABFA3B92615E55800AF0F57 /* Info.plist */,
 			);
 			path = "RACObjC-UI";
@@ -874,6 +876,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sdkdimon.RACObjC-UIKit";
 				PRODUCT_NAME = "RACObjC-UI";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -903,6 +906,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sdkdimon.RACObjC-UIKit";
 				PRODUCT_NAME = "RACObjC-UI";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -986,6 +990,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sdkdimon.RACObjC-UIKit";
 				PRODUCT_NAME = "RACObjC-UI";
 				PROVISIONING_PROFILE_SPECIFIER = "";
@@ -1016,6 +1021,7 @@
 					"@loader_path/Frameworks",
 				);
 				MACOSX_DEPLOYMENT_TARGET = "$(inherited)";
+				MODULEMAP_FILE = "$(PROJECT_DIR)/$(PRODUCT_NAME)/$(PRODUCT_NAME).modulemap";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.sdkdimon.RACObjC-UIKit";
 				PRODUCT_NAME = "RACObjC-UI";
 				PROVISIONING_PROFILE_SPECIFIER = "";
