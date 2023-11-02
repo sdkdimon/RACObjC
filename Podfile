@@ -25,18 +25,6 @@ target 'RACObjC-tvOSTests' do
   test_pods
 end
 
-target 'RACObjC-UI-iOSTests' do
-    project 'UI/RACObjC-UI.xcodeproj'
-    platform :ios, '12.0'
-    test_pods
-end
-
-target 'RACObjC-UI-AppKitTests' do
-    project 'UI/RACObjC-UI.xcodeproj'
-    platform :osx, '10.15'
-    test_pods
-end
-
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
