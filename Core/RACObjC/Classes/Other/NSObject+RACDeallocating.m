@@ -39,6 +39,13 @@ static void swizzleDeallocIfNeeded(Class classToSwizzle) {
 			[compoundDisposable dispose];
 
 			if (originalDealloc == NULL) {
+#ifdef GNUSTEP
+				// libobjc2 has no objc_msgSendSuper: look up the superclass IMP
+				// and call it. Positional init fits its objc_super layout.
+				struct objc_super superInfo = { self, class_getSuperclass(classToSwizzle) };
+				void (*superDealloc)(__unsafe_unretained id, SEL) = (__typeof__(superDealloc))objc_msg_lookup_super(&superInfo, deallocSelector);
+				superDealloc(self, deallocSelector);
+#else
 				struct objc_super superInfo = {
 					.receiver = self,
 					.super_class = class_getSuperclass(classToSwizzle)
@@ -46,6 +53,7 @@ static void swizzleDeallocIfNeeded(Class classToSwizzle) {
 
 				void (*msgSend)(struct objc_super *, SEL) = (__typeof__(msgSend))objc_msgSendSuper;
 				msgSend(&superInfo, deallocSelector);
+#endif
 			} else {
 				originalDealloc(self, deallocSelector);
 			}

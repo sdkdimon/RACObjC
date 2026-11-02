@@ -9,7 +9,9 @@
 #import "NSInvocation+RACTypeParsing.h"
 #import "RACTuple.h"
 #import "RACUnit.h"
+#ifndef GNUSTEP
 #import <CoreGraphics/CoreGraphics.h>
+#endif
 
 @implementation NSInvocation (RACTypeParsing)
 

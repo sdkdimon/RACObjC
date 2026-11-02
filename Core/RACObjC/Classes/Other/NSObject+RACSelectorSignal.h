@@ -16,6 +16,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// The domain for any errors originating from -rac_signalForSelector:.
 extern NSErrorDomain const RACSelectorSignalErrorDomain;
 
+// GNUstep's Foundation has no NS_ERROR_ENUM.
+#ifndef NS_ERROR_ENUM
+#define NS_ERROR_ENUM(_domain, _name) enum _name : NSInteger _name; enum _name : NSInteger
+#endif
+
 typedef NS_ERROR_ENUM(RACSelectorSignalErrorDomain, RACSelectorSignalError) {
 	/// -rac_signalForSelector: was going to add a new method implementation for
 	/// `selector`, but another thread added an implementation before it was able to.

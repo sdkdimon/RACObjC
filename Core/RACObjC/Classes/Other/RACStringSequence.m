@@ -49,9 +49,21 @@
 	NSUInteger substringLength = self.string.length - self.offset;
 	NSMutableArray *array = [NSMutableArray arrayWithCapacity:substringLength];
 
+#ifdef GNUSTEP
+	// GNUstep's -enumerateSubstringsInRange:options: with
+	// NSStringEnumerationByComposedCharacterSequences runs past the end of the
+	// range and throws NSRangeException, so walk the sequences by hand.
+	NSUInteger location = self.offset;
+	while (location < self.string.length) {
+		NSRange range = [self.string rangeOfComposedCharacterSequenceAtIndex:location];
+		[array addObject:[self.string substringWithRange:range]];
+		location = NSMaxRange(range);
+	}
+#else
 	[self.string enumerateSubstringsInRange:NSMakeRange(self.offset, substringLength) options:NSStringEnumerationByComposedCharacterSequences usingBlock:^(NSString *substring, NSRange substringRange, NSRange enclosingRange, BOOL *stop) {
 		[array addObject:substring];
 	}];
+#endif
 
 	return [array copy];
 }

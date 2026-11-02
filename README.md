@@ -484,6 +484,9 @@ RACSequence *results = [[strings.rac_sequence
 
 ReactiveObjC supports OS X 10.8+ and iOS 8.0+.
 
+It also builds on GNUstep (clang + libobjc2 + libdispatch), e.g. on FreeBSD
+or Linux. See [Core/RACObjC/GNUstep/README.md](Core/RACObjC/GNUstep/README.md).
+
 ## Importing ReactiveObjC
 
 To add RAC to your application:

@@ -11,7 +11,13 @@
 @interface RACKVOProxy()
 
 @property (strong, nonatomic, readonly) NSMapTable *trampolines;
+#if OS_OBJECT_USE_OBJC
 @property (strong, nonatomic, readonly) dispatch_queue_t queue;
+#else
+// libdispatch objects are not ObjC objects here (e.g. GNUstep). The shared
+// proxy is never deallocated, so the queue is simply never released.
+@property (assign, nonatomic, readonly) dispatch_queue_t queue;
+#endif
 
 @end
 

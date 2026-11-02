@@ -21,6 +21,23 @@
 		createSignal:^(id<RACSubscriber> subscriber) {
 			NSOperationQueue *queue = [[NSOperationQueue alloc] init];
 			queue.name = @"org.reactivecocoa.ReactiveObjC.NSURLConnectionRACSupport";
+#ifdef GNUSTEP
+			// GNUstep has no +sendAsynchronousRequest:queue:completionHandler:,
+			// so run the synchronous request on the private queue instead.
+			[queue addOperationWithBlock:^{
+				NSURLResponse *response = nil;
+				NSError *error = nil;
+				NSData *data = [NSURLConnection sendSynchronousRequest:request returningResponse:&response error:&error];
+
+				// Same handling as the Apple branch below.
+				if (response == nil || data == nil) {
+					[subscriber sendError:error];
+				} else {
+					[subscriber sendNext:RACTuplePack(response, data)];
+					[subscriber sendCompleted];
+				}
+			}];
+#else
 #pragma clang diagnostic push
 #pragma clang diagnostic ignored "-Wdeprecated-declarations"
 			[NSURLConnection sendAsynchronousRequest:request queue:queue completionHandler:^(NSURLResponse *response, NSData *data, NSError *error) {
@@ -38,6 +55,7 @@
 				}
 			}];
 #pragma clang diagnostic pop
+#endif
 			
 			return [RACDisposable disposableWithBlock:^{
 				// It's not clear if this will actually cancel the connection,
