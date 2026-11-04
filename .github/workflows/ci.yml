@@ -1,0 +1,34 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  apple:
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+      - name: macOS tests
+        run: >
+          xcodebuild test
+          -workspace RACObjC.xcworkspace
+          -scheme RACObjC-macOSTests
+          -destination 'platform=macOS'
+          CODE_SIGN_IDENTITY=- CODE_SIGN_STYLE=Manual
+          DEVELOPMENT_TEAM= PROVISIONING_PROFILE_SPECIFIER=
+      - name: iOS simulator build
+        run: >
+          xcodebuild build
+          -workspace RACObjC.xcworkspace
+          -scheme RACObjC-iOS
+          -destination 'generic/platform=iOS Simulator'
