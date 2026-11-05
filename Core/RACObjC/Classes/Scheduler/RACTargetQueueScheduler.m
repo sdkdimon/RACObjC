@@ -25,7 +25,14 @@
 
 	dispatch_set_target_queue(queue, targetQueue);
 
+#if OS_OBJECT_USE_OBJC
 	return [super initWithName:name queue:queue];
+#else
+	// The superclass retains the queue; drop the reference from dispatch_queue_create.
+	self = [super initWithName:name queue:queue];
+	dispatch_release(queue);
+	return self;
+#endif
 }
 
 @end

@@ -98,9 +98,17 @@
 	dispatch_source_set_event_handler(timer, block);
 	dispatch_resume(timer);
 
+#if OS_OBJECT_USE_OBJC
 	return [RACDisposable disposableWithBlock:^{
 		dispatch_source_cancel(timer);
 	}];
+#else
+	// The timer is not an ObjC object here (e.g. GNUstep), so release it by hand.
+	return [RACDisposable disposableWithBlock:^{
+		dispatch_source_cancel(timer);
+		dispatch_release(timer);
+	}];
+#endif
 }
 
 @end

@@ -18,6 +18,14 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
+#ifdef GNUSTEP
+// libobjc2 has no _objc_msgForward; see GNUstep/RACObjCMsgForward.c.
+extern void RACObjCMsgForward(void);
+#define RACMsgForwardIMP ((IMP)RACObjCMsgForward)
+#else
+#define RACMsgForwardIMP _objc_msgForward
+#endif
+
 NSErrorDomain const RACSelectorSignalErrorDomain = @"RACSelectorSignalErrorDomain";
 
 static NSString * const RACSignalForSelectorAliasPrefix = @"rac_alias_";
@@ -104,7 +112,7 @@ static void RACSwizzleRespondsToSelector(Class class) {
 	id newRespondsToSelector = ^ BOOL (id self, SEL selector) {
 		Method method = rac_getImmediateInstanceMethod(class, selector);
 
-		if (method != NULL && method_getImplementation(method) == _objc_msgForward) {
+		if (method != NULL && method_getImplementation(method) == RACMsgForwardIMP) {
 			SEL aliasSelector = RACAliasForSelector(selector);
 			if (objc_getAssociatedObject(self, aliasSelector) != nil) return YES;
 		}
@@ -135,12 +143,20 @@ static void RACSwizzleMethodSignatureForSelector(Class class) {
 			// here.
 			//
 			// Call the original class' -methodSignatureForSelector:.
+#ifdef GNUSTEP
+			// libobjc2 has no objc_msgSendSuper: look up the superclass IMP
+			// and call it. Positional init fits its objc_super layout.
+			struct objc_super target = { self, class_getSuperclass(class) };
+			NSMethodSignature * (*superIMP)(id, SEL, SEL) = (__typeof__(superIMP))objc_msg_lookup_super(&target, @selector(methodSignatureForSelector:));
+			return superIMP(self, @selector(methodSignatureForSelector:), selector);
+#else
 			struct objc_super target = {
 				.super_class = class_getSuperclass(class),
 				.receiver = self,
 			};
 			NSMethodSignature * (*messageSend)(struct objc_super *, SEL, SEL) = (__typeof__(messageSend))objc_msgSendSuper;
 			return messageSend(&target, @selector(methodSignatureForSelector:), selector);
+#endif
 		}
 
 		char const *encoding = method_getTypeEncoding(method);
@@ -209,7 +225,7 @@ static RACSignal *NSObjectRACSignalForSelector(NSObject *self, SEL selector, Pro
 			RACCheckTypeEncoding(typeEncoding);
 
 			// Define the selector to call -forwardInvocation:.
-			if (!class_addMethod(class, selector, _objc_msgForward, typeEncoding)) {
+			if (!class_addMethod(class, selector, RACMsgForwardIMP, typeEncoding)) {
 				NSDictionary *userInfo = @{
 					NSLocalizedDescriptionKey: [NSString stringWithFormat:NSLocalizedString(@"A race condition occurred implementing %@ on class %@", nil), NSStringFromSelector(selector), class],
 					NSLocalizedRecoverySuggestionErrorKey: NSLocalizedString(@"Invoke -rac_signalForSelector: again to override the implementation.", nil)
@@ -217,7 +233,7 @@ static RACSignal *NSObjectRACSignalForSelector(NSObject *self, SEL selector, Pro
 
 				return [RACSignal error:[NSError errorWithDomain:RACSelectorSignalErrorDomain code:RACSelectorSignalErrorMethodSwizzlingRace userInfo:userInfo]];
 			}
-		} else if (method_getImplementation(targetMethod) != _objc_msgForward) {
+		} else if (method_getImplementation(targetMethod) != RACMsgForwardIMP) {
 			// Make a method alias for the existing method implementation.
 			const char *typeEncoding = method_getTypeEncoding(targetMethod);
 
@@ -227,7 +243,7 @@ static RACSignal *NSObjectRACSignalForSelector(NSObject *self, SEL selector, Pro
 			NSCAssert(addedAlias, @"Original implementation for %@ is already copied to %@ on %@", NSStringFromSelector(selector), NSStringFromSelector(aliasSelector), class);
 
 			// Redefine the selector to call -forwardInvocation:.
-			class_replaceMethod(class, selector, _objc_msgForward, method_getTypeEncoding(targetMethod));
+			class_replaceMethod(class, selector, RACMsgForwardIMP, method_getTypeEncoding(targetMethod));
 		}
 
 		return subject;

@@ -137,7 +137,13 @@ static void RACReleaseScheduledAction(CFAllocatorRef allocator, const void *ptr)
 	NSCParameterAssert(block != nil);
 
 	@synchronized (self) {
+#ifdef GNUSTEP
+		// GNUstep's tagged NSDate cannot represent an interval of exactly 0
+		// (it decodes as 2.0), which would misorder the first block. Start at 1.
+		NSDate *uniqueDate = [NSDate dateWithTimeIntervalSinceReferenceDate:self.numberOfDirectlyScheduledBlocks + 1];
+#else
 		NSDate *uniqueDate = [NSDate dateWithTimeIntervalSinceReferenceDate:self.numberOfDirectlyScheduledBlocks];
+#endif
 		self.numberOfDirectlyScheduledBlocks++;
 
 		RACTestSchedulerAction *action = [[RACTestSchedulerAction alloc] initWithDate:uniqueDate block:block];

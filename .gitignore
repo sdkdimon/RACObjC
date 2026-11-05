@@ -1,2 +1,7 @@
 .DS_Store
 xcuserdata
+
+# GNUstep build output
+Core/RACObjC/obj/
+Core/RACObjC/derived_src/
+Core/RACObjC/GNUstep/Tests/obj/

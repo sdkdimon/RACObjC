@@ -25,6 +25,11 @@ NS_ASSUME_NONNULL_BEGIN
 /// The domain for errors originating in RACSignal operations.
 extern NSErrorDomain const RACSignalErrorDomain;
 
+// GNUstep's Foundation has no NS_ERROR_ENUM.
+#ifndef NS_ERROR_ENUM
+#define NS_ERROR_ENUM(_domain, _name) enum _name : NSInteger _name; enum _name : NSInteger
+#endif
+
 typedef NS_ERROR_ENUM(RACSignalErrorDomain, RACSignalError) {
 	/// The error code used with -timeout:.
 	RACSignalErrorTimedOut = 1,

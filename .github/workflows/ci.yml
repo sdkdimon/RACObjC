@@ -32,3 +32,106 @@ jobs:
           -workspace RACObjC.xcworkspace
           -scheme RACObjC-iOS
           -destination 'generic/platform=iOS Simulator'
+
+  gnustep:
+    name: gnustep (${{ matrix.os }})
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-24.04, ubuntu-24.04-arm]
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    defaults:
+      run:
+        shell: bash
+    env:
+      # GNUstep stack: libobjc2, libdispatch, gnustep-make, gnustep-base, all built with clang.
+      # Changing a version changes the cache key, so the stack is rebuilt.
+      LIBOBJC2_REF: v2.3
+      LIBDISPATCH_REF: swift-6.4.2-RELEASE
+      TOOLS_MAKE_REF: make-2_9_3
+      LIBS_BASE_REF: base-1_31_1
+      # Ubuntu's clang 18. GitHub's images also carry a Swift toolchain with
+      # its own clang, so name the compiler by path.
+      CC: /usr/bin/clang
+      CXX: /usr/bin/clang++
+      LDFLAGS: -fuse-ld=lld
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Install build dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y --no-install-recommends \
+            make pkg-config clang lld cmake ninja-build libffi-dev libxml2-dev libxslt1-dev \
+            libgnutls28-dev libicu-dev zlib1g-dev libcurl4-openssl-dev
+
+      - name: Restore GNUstep stack
+        id: stack
+        uses: actions/cache/restore@v6
+        with:
+          path: ~/gnustep-stack
+          key: gnustep-${{ matrix.os }}-${{ env.LIBOBJC2_REF }}-${{ env.LIBDISPATCH_REF }}-${{ env.TOOLS_MAKE_REF }}-${{ env.LIBS_BASE_REF }}-v1
+
+      # Each component installs into ~/gnustep-stack (DESTDIR), which is then
+      # copied into / so the next component builds against it. A cache hit
+      # restores the same folder and only does the copy.
+      - name: Build GNUstep stack
+        if: steps.stack.outputs.cache-hit != 'true'
+        run: |
+          STAGE="$HOME/gnustep-stack"
+          publish() { sudo cp -a "$STAGE"/. / && sudo ldconfig; }
+          mkdir -p "$STAGE" "$RUNNER_TEMP/src"
+          cd "$RUNNER_TEMP/src"
+
+          git clone --depth 1 --recurse-submodules -b "$LIBOBJC2_REF" https://github.com/gnustep/libobjc2
+          cmake -S libobjc2 -B libobjc2/build -G Ninja -DCMAKE_BUILD_TYPE=Release -DTESTS=OFF
+          ninja -C libobjc2/build
+          sudo DESTDIR="$STAGE" ninja -C libobjc2/build install
+          publish
+
+          git clone --depth 1 -b "$LIBDISPATCH_REF" https://github.com/swiftlang/swift-corelibs-libdispatch
+          cmake -S swift-corelibs-libdispatch -B swift-corelibs-libdispatch/build -G Ninja \
+            -DCMAKE_BUILD_TYPE=RelWithDebInfo -DINSTALL_PRIVATE_HEADERS=YES
+          ninja -C swift-corelibs-libdispatch/build
+          sudo DESTDIR="$STAGE" ninja -C swift-corelibs-libdispatch/build install
+          publish
+
+          git clone --depth 1 -b "$TOOLS_MAKE_REF" https://github.com/gnustep/tools-make
+          (cd tools-make && ./configure --with-layout=fhs --enable-native-objc-exceptions \
+            --enable-objc-arc --with-library-combo=ng-gnu-gnu)
+          sudo make -C tools-make install DESTDIR="$STAGE"
+          publish
+
+          . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
+          git clone --depth 1 -b "$LIBS_BASE_REF" https://github.com/gnustep/libs-base
+          (cd libs-base && ./configure && make -j"$(nproc)")
+          sudo -E make -C libs-base install DESTDIR="$STAGE"
+          publish
+
+      # Saved right after the build, so a failing smoke test doesn't throw
+      # the built stack away.
+      - name: Save GNUstep stack
+        if: steps.stack.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v6
+        with:
+          path: ~/gnustep-stack
+          key: ${{ steps.stack.outputs.cache-primary-key }}
+
+      - name: Install GNUstep stack from cache
+        if: steps.stack.outputs.cache-hit == 'true'
+        run: sudo cp -a "$HOME/gnustep-stack"/. / && sudo ldconfig
+
+      - name: Check GNUstep configuration
+        run: |
+          . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
+          echo "arch: $(uname -m), $("$CC" --version | head -1)"
+          # RACScheduler.mainThreadScheduler needs the run loop to drain the main queue.
+          config="$(gnustep-config --variable=GNUSTEP_SYSTEM_HEADERS)/GNUstepBase/GSConfig.h"
+          grep GS_USE_LIBDISPATCH_RUNLOOP "$config"
+          grep -q 'GS_USE_LIBDISPATCH_RUNLOOP 1' "$config"
+
+      - name: Smoke tests
+        run: |
+          . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
+          make -C Core/RACObjC check
