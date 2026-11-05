@@ -1355,16 +1355,23 @@ qck_describe(@"-setKeyPath:onObject:", ^{
 
 		__unsafe_unretained RACTestObject *unsafeTestObject = testObject;
 		[testObject.rac_deallocDisposable addDisposable:[RACDisposable disposableWithBlock:^{
-			deallocValue = unsafeTestObject.slowObjectValue;
+			deallocValue = unsafeTestObject.hookedObjectValue;
 		}]];
 
-		[subject setKeyPath:@keypath(testObject.slowObjectValue) onObject:testObject];
-		expect(testObject.slowObjectValue).to(beNil());
+		[subject setKeyPath:@keypath(testObject.hookedObjectValue) onObject:testObject];
+		expect(testObject.hookedObjectValue).to(beNil());
 
-		// Attempt to deallocate concurrently.
-		[[RACScheduler scheduler] afterDelay:0.01 schedule:^{
-			testObject = nil;
-		}];
+		// Inside the setter, release the last outside reference on another
+		// thread, so only the binding's own reference is left while it sets the
+		// value.
+		testObject.willSetHookedObjectValue = ^{
+			dispatch_semaphore_t released = dispatch_semaphore_create(0);
+			[[RACScheduler scheduler] schedule:^{
+				testObject = nil;
+				dispatch_semaphore_signal(released);
+			}];
+			dispatch_semaphore_wait(released, DISPATCH_TIME_FOREVER);
+		};
 
 		expect(deallocValue).to(beNil());
 		[subject sendNext:@1];
