@@ -92,6 +92,8 @@ typedef NS_ERROR_ENUM(RACSignalErrorDomain, RACSignalError) {
 /// If +[RACScheduler currentScheduler] is nil when `next` or `completed` is
 /// received, a private background scheduler is used.
 ///
+/// Delayed events are forwarded in the order they were received.
+///
 /// Returns a signal which sends delayed `next` and `completed` events. Errors
 /// are always forwarded immediately.
 - (RACSignal<ValueType> *)delay:(NSTimeInterval)interval RAC_WARN_UNUSED_RESULT;
@@ -439,7 +441,7 @@ typedef NS_ERROR_ENUM(RACSignalErrorDomain, RACSignalError) {
 /// Returns a signal which transforms all the values of the receiver. If
 /// `mapBlock` returns nil for any value, the returned signal will error using
 /// the `NSError` passed out from the block.
-- (RACSignal *)tryMap:(id (^)(id _Nullable value, NSError **errorPtr))mapBlock RAC_WARN_UNUSED_RESULT;
+- (RACSignal *)tryMap:(id _Nullable (^)(id _Nullable value, NSError **errorPtr))mapBlock RAC_WARN_UNUSED_RESULT;
 
 /// Returns the first `next`. Note that this is a blocking call.
 - (nullable ValueType)first;

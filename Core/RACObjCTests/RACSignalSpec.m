@@ -2442,6 +2442,35 @@ qck_describe(@"-delay:", ^{
 		expect(error).to(equal(RACSignalTestError));
 	});
 
+	qck_it(@"should forward nexts and completed in the order they were received", ^{
+		NSArray *values = @[ @1, @2, @3, @4, @5 ];
+
+		// GCD doesn't guarantee that timers fire in deadline order, so repeat
+		// enough times for a reordering to show up.
+		NSUInteger outOfOrderCount = 0;
+		for (NSUInteger iteration = 0; iteration < 50; iteration++) {
+			RACSubject *source = [RACSubject subject];
+			NSMutableArray *received = [NSMutableArray array];
+			__block NSArray *receivedAtCompletion = nil;
+
+			[[source delay:0] subscribeNext:^(id x) {
+				[received addObject:x];
+			} completed:^{
+				receivedAtCompletion = [received copy];
+			}];
+
+			for (id value in values) {
+				[source sendNext:value];
+			}
+			[source sendCompleted];
+
+			expect(receivedAtCompletion).toEventuallyNot(beNil());
+			if (![receivedAtCompletion isEqual:values]) outOfOrderCount++;
+		}
+
+		expect(@(outOfOrderCount)).to(equal(@0));
+	});
+
 	qck_it(@"should cancel delayed events when disposed", ^{
 		__block id next = nil;
 		RACDisposable *disposable = [delayedSignal subscribeNext:^(id x) {

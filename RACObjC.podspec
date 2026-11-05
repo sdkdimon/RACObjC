@@ -35,17 +35,19 @@ Pod::Spec.new do |s|
                                 "Core/RACObjC/Classes/**/*EXTRuntimeExtensions.h",
                                 "Core/RACObjC/Classes/**/RACEmpty*.h"
 
+  s.resource_bundles = { "RACObjC_Privacy" => ["Core/RACObjC/PrivacyInfo.xcprivacy"] }
+
   s.requires_arc = true
 
   s.frameworks   = "Foundation"
   
   s.prepare_command = <<-'CMD'.strip_heredoc
-                         find -E . -type f -not -name 'RAC*' -regex '.*(EXT.*|metamacros)\.[hm]$' \
+                         /usr/bin/find -E . -type f -not -name 'RAC*' -regex '.*(EXT.*|metamacros)\.[hm]$' \
                                    -execdir mv '{}' RAC'{}' \;
-                         find . -regex '.*\.[hm]' \
+                         /usr/bin/find . -regex '.*\.[hm]' \
                                 -exec perl -pi \
                                            -e 's@"(?:(?!RAC)(EXT.*|metamacros))\.h"@"RAC\1.h"@' '{}' \;
-                         find . -regex '.*\.[hm]' \
+                         /usr/bin/find . -regex '.*\.[hm]' \
                                 -exec perl -pi \
                                            -e 's@<RACObjC/(?:(?!RAC)(EXT.*|metamacros))\.h>@<RACObjC/RAC\1.h>@' '{}' \;
                        CMD
