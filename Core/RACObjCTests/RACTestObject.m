@@ -43,9 +43,9 @@
 	self.secondObjectValue = secondObjectValue;
 }
 
-- (void)setSlowObjectValue:(id)value {
-	[NSThread sleepForTimeInterval:0.02];
-	_slowObjectValue = value;
+- (void)setHookedObjectValue:(id)value {
+	if (self.willSetHookedObjectValue != nil) self.willSetHookedObjectValue();
+	_hookedObjectValue = value;
 }
 
 - (NSString *)combineObjectValue:(id)objectValue andIntegerValue:(NSInteger)integerValue {
