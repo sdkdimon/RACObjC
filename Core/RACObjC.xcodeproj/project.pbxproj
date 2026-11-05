@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		252541A4FEE0B69828355900 /* Pods_RACObjC_macOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F61BE1BA9D746B8A38DD26A7 /* Pods_RACObjC_macOSTests.framework */; };
 		319421439F27E198EF399B6A /* Pods_RACObjC_tvOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 9837E1C6F8CAD70951BE43B9 /* Pods_RACObjC_tvOSTests.framework */; };
+		7AA6CE62D6DB7A4BF38590DB /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2CDE57B5DA157B0DFED2789 /* PrivacyInfo.xcprivacy */; };
 		8A47977A26163E9F0083A004 /* NSURLConnection+RACSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A47977826163E9F0083A004 /* NSURLConnection+RACSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8A47977B26163E9F0083A004 /* NSURLConnection+RACSupport.h in Headers */ = {isa = PBXBuildFile; fileRef = 8A47977826163E9F0083A004 /* NSURLConnection+RACSupport.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		8A47977C26163E9F0083A004 /* NSURLConnection+RACSupport.m in Sources */ = {isa = PBXBuildFile; fileRef = 8A47977926163E9F0083A004 /* NSURLConnection+RACSupport.m */; };
@@ -585,7 +586,9 @@
 		8ABFA6C0261638CC00AF0F57 /* RACStreamExamples.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ABFA65D261638CC00AF0F57 /* RACStreamExamples.m */; };
 		8ABFA6C1261638CC00AF0F57 /* RACDisposableSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ABFA65E261638CC00AF0F57 /* RACDisposableSpec.m */; };
 		8ABFA6C2261638CC00AF0F57 /* RACDisposableSpec.m in Sources */ = {isa = PBXBuildFile; fileRef = 8ABFA65E261638CC00AF0F57 /* RACDisposableSpec.m */; };
+		934E6A27C34A1F570DBB0B38 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2CDE57B5DA157B0DFED2789 /* PrivacyInfo.xcprivacy */; };
 		C68349B8433B09AC1170EF45 /* Pods_RACObjC_iOSTests.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 3EFC4D08D2C421D33D8E3597 /* Pods_RACObjC_iOSTests.framework */; };
+		E112350AEC4730EE2E161E39 /* PrivacyInfo.xcprivacy in Resources */ = {isa = PBXBuildFile; fileRef = E2CDE57B5DA157B0DFED2789 /* PrivacyInfo.xcprivacy */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -830,6 +833,7 @@
 		9837E1C6F8CAD70951BE43B9 /* Pods_RACObjC_tvOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RACObjC_tvOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		9D2E45597D37D5FB183ECB3F /* Pods-RACObjC-tvOSTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-tvOSTests.release.xcconfig"; path = "Target Support Files/Pods-RACObjC-tvOSTests/Pods-RACObjC-tvOSTests.release.xcconfig"; sourceTree = "<group>"; };
 		E1AC71D503BA2350C99A415F /* Pods-RACObjC-iOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-iOSTests.debug.xcconfig"; path = "Target Support Files/Pods-RACObjC-iOSTests/Pods-RACObjC-iOSTests.debug.xcconfig"; sourceTree = "<group>"; };
+		E2CDE57B5DA157B0DFED2789 /* PrivacyInfo.xcprivacy */ = {isa = PBXFileReference; lastKnownFileType = text.xml; path = PrivacyInfo.xcprivacy; sourceTree = "<group>"; };
 		E6F4AFA96A48B76415C95A99 /* Pods-RACObjC-tvOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-tvOSTests.debug.xcconfig"; path = "Target Support Files/Pods-RACObjC-tvOSTests/Pods-RACObjC-tvOSTests.debug.xcconfig"; sourceTree = "<group>"; };
 		F61BE1BA9D746B8A38DD26A7 /* Pods_RACObjC_macOSTests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_RACObjC_macOSTests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		FA52983360493FD9D0F389AF /* Pods-RACObjC-macOSTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-RACObjC-macOSTests.debug.xcconfig"; path = "Target Support Files/Pods-RACObjC-macOSTests/Pods-RACObjC-macOSTests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -942,6 +946,7 @@
 				8ABFA2332615E1CD00AF0F57 /* RACObjC.h */,
 				8A402A842AF2307A00043C83 /* RACObjC.modulemap */,
 				8ABFA2342615E1CD00AF0F57 /* Info.plist */,
+				E2CDE57B5DA157B0DFED2789 /* PrivacyInfo.xcprivacy */,
 			);
 			path = RACObjC;
 			sourceTree = "<group>";
@@ -1669,6 +1674,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				7AA6CE62D6DB7A4BF38590DB /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1684,6 +1690,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				934E6A27C34A1F570DBB0B38 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -1699,6 +1706,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E112350AEC4730EE2E161E39 /* PrivacyInfo.xcprivacy in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

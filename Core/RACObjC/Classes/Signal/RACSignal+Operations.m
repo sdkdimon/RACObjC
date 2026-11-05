@@ -198,9 +198,35 @@ static RACDisposable *subscribeForever (RACSignal *signal, void (^next)(id), voi
 		// time so that our scheduled blocks are run serially if we do.
 		RACScheduler *scheduler = [RACScheduler scheduler];
 
+		// Events waiting to be forwarded, in the order they were received. GCD
+		// doesn't guarantee that timers fire in deadline order, so when an
+		// event's timer fires, it also forwards any earlier events still
+		// waiting (their deadlines have already passed).
+		NSMutableArray<dispatch_block_t> *pendingEvents = [NSMutableArray array];
+
 		void (^schedule)(dispatch_block_t) = ^(dispatch_block_t block) {
+			dispatch_block_t event = [block copy];
+			@synchronized (pendingEvents) {
+				[pendingEvents addObject:event];
+			}
+
 			RACScheduler *delayScheduler = RACScheduler.currentScheduler ?: scheduler;
-			RACDisposable *schedulerDisposable = [delayScheduler afterDelay:interval schedule:block];
+			RACDisposable *schedulerDisposable = [delayScheduler afterDelay:interval schedule:^{
+				NSArray<dispatch_block_t> *dueEvents = nil;
+				@synchronized (pendingEvents) {
+					// Already forwarded by a later event's timer.
+					NSUInteger index = [pendingEvents indexOfObjectIdenticalTo:event];
+					if (index == NSNotFound) return;
+
+					NSRange dueRange = NSMakeRange(0, index + 1);
+					dueEvents = [pendingEvents subarrayWithRange:dueRange];
+					[pendingEvents removeObjectsInRange:dueRange];
+				}
+
+				for (dispatch_block_t dueEvent in dueEvents) {
+					dueEvent();
+				}
+			}];
 			[disposable addDisposable:schedulerDisposable];
 		};
 
