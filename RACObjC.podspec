@@ -23,19 +23,56 @@ Pod::Spec.new do |s|
   s.ios.deployment_target     = "12.0"
   s.osx.deployment_target     = "10.13"
   s.watchos.deployment_target = "2.0"
-  s.tvos.deployment_target    = "12.0"
 
-  s.module_map = "Core/RACObjC/RACObjC.modulemap"
-  
-  s.source_files         = "Core/RACObjC/Classes/EXTObjC/*.{h,m}",
-                                "Core/RACObjC/Classes/**/*.{h,m,d}",
-                                "Core/RACObjC/RACObjC.h"
-                              
-  s.private_header_files = "Core/RACObjC/Classes/**/*Private.h",
-                                "Core/RACObjC/Classes/**/*EXTRuntimeExtensions.h",
-                                "Core/RACObjC/Classes/**/RACEmpty*.h"
+  s.module_map = "RACObjC/RACObjC.modulemap"
 
-  s.resource_bundles = { "RACObjC_Privacy" => ["Core/RACObjC/PrivacyInfo.xcprivacy"] }
+  s.resource_bundles = { "RACObjC_Privacy" => ["RACObjC/PrivacyInfo.xcprivacy"] }
+
+  # One subspec per module (RACObjC/<Module>). The default is all
+  # of them, as before the split; pick fewer with e.g. pod 'RACObjC/KVO'.
+  s.default_subspecs = "Core", "Deallocation", "KVO", "Command", "Swizzling", "Extras"
+
+  # Signals and their operators, subjects, subscribers, disposables,
+  # schedulers, sequences and tuples. No KVO and no swizzling.
+  s.subspec "Core" do |ss|
+    ss.source_files         = "RACObjC/RACObjC.h",
+                              "RACObjC/Core/**/*.{h,m,d}"
+    ss.private_header_files = "RACObjC/Core/**/*Private.h",
+                              "RACObjC/Core/**/*EXTRuntimeExtensions.h",
+                              "RACObjC/Core/**/RACEmpty*.h"
+  end
+
+  # -rac_willDeallocSignal and -rac_deallocDisposable (swizzle -dealloc).
+  s.subspec "Deallocation" do |ss|
+    ss.dependency "RACObjC/Core"
+    ss.source_files = "RACObjC/Deallocation/**/*.{h,m}"
+  end
+
+  # RACObserve(), RACChannelTo(), RAC() and -setKeyPath:onObject:.
+  s.subspec "KVO" do |ss|
+    ss.dependency "RACObjC/Deallocation"
+    ss.source_files = "RACObjC/KVO/**/*.{h,m}"
+  end
+
+  # RACCommand.
+  s.subspec "Command" do |ss|
+    ss.dependency "RACObjC/Deallocation"
+    ss.source_files = "RACObjC/Command/**/*.{h,m}"
+  end
+
+  # -rac_signalForSelector:, RACDelegateProxy, -rac_liftSelector:withSignals:.
+  s.subspec "Swizzling" do |ss|
+    ss.dependency "RACObjC/Deallocation"
+    ss.source_files = "RACObjC/Swizzling/**/*.{h,m}"
+  end
+
+  # Foundation additions: -rac_sequence for collections, strings and
+  # enumerators; signals for NSNotificationCenter, NSData, NSString,
+  # NSFileHandle and NSUserDefaults; RACValueTransformer.
+  s.subspec "Extras" do |ss|
+    ss.dependency "RACObjC/Deallocation"
+    ss.source_files = "RACObjC/Extras/**/*.{h,m}"
+  end
 
   s.requires_arc = true
 

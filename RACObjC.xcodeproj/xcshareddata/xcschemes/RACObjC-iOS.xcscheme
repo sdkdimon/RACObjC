@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Scheme
+   LastUpgradeVersion = "2660"
+   version = "1.3">
+   <BuildAction
+      parallelizeBuildables = "YES"
+      buildImplicitDependencies = "YES">
+      <BuildActionEntries>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "8ABFA22F2615E1CD00AF0F57"
+               BuildableName = "RACObjC.framework"
+               BlueprintName = "RACObjC-iOS"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+      </BuildActionEntries>
+   </BuildAction>
+   <TestAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      shouldUseLaunchSchemeArgsEnv = "YES">
+      <Testables>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "571CDC53C9D4BA2F717EE913"
+               BuildableName = "RACObjCCore-iOSTests.xctest"
+               BlueprintName = "RACObjCCore-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "0A3807B0549E03BC4A46A31B"
+               BuildableName = "RACObjCDeallocation-iOSTests.xctest"
+               BlueprintName = "RACObjCDeallocation-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "E52E8038E2AF562ADAAC46AB"
+               BuildableName = "RACObjCKVO-iOSTests.xctest"
+               BlueprintName = "RACObjCKVO-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "EBEC51A7383F40E89C863612"
+               BuildableName = "RACObjCCommand-iOSTests.xctest"
+               BlueprintName = "RACObjCCommand-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "67CC2A242EF51895E23795DC"
+               BuildableName = "RACObjCSwizzling-iOSTests.xctest"
+               BlueprintName = "RACObjCSwizzling-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+         <TestableReference
+            skipped = "NO">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "51DF26A7734A9C82B87E7E52"
+               BuildableName = "RACObjCExtras-iOSTests.xctest"
+               BlueprintName = "RACObjCExtras-iOSTests"
+               ReferencedContainer = "container:RACObjC.xcodeproj">
+            </BuildableReference>
+         </TestableReference>
+      </Testables>
+   </TestAction>
+   <LaunchAction
+      buildConfiguration = "Debug"
+      selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
+      selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
+      launchStyle = "0"
+      useCustomWorkingDirectory = "NO"
+      ignoresPersistentStateOnLaunch = "NO"
+      debugDocumentVersioning = "YES"
+      debugServiceExtension = "internal"
+      allowLocationSimulation = "YES">
+   </LaunchAction>
+   <ProfileAction
+      buildConfiguration = "Release"
+      shouldUseLaunchSchemeArgsEnv = "YES"
+      savedToolIdentifier = ""
+      useCustomWorkingDirectory = "NO"
+      debugDocumentVersioning = "YES">
+      <MacroExpansion>
+         <BuildableReference
+            BuildableIdentifier = "primary"
+            BlueprintIdentifier = "8ABFA22F2615E1CD00AF0F57"
+            BuildableName = "RACObjC.framework"
+            BlueprintName = "RACObjC-iOS"
+            ReferencedContainer = "container:RACObjC.xcodeproj">
+         </BuildableReference>
+      </MacroExpansion>
+   </ProfileAction>
+   <AnalyzeAction
+      buildConfiguration = "Debug">
+   </AnalyzeAction>
+   <ArchiveAction
+      buildConfiguration = "Release"
+      revealArchiveInOrganizer = "YES">
+   </ArchiveAction>
+</Scheme>

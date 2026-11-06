@@ -1,0 +1,6 @@
+framework module CwlMachBadInstructionHandler {
+  umbrella header "CwlMachBadInstructionHandler-macOS-umbrella.h"
+
+  export *
+  module * { export * }
+}
