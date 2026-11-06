@@ -43,7 +43,9 @@ typedef struct {
 @property (nonatomic, copy) NSArray *arrayValue;
 @property (nonatomic, copy) NSSet *setValue;
 @property (nonatomic, copy) NSOrderedSet *orderedSetValue;
-@property (nonatomic, strong) id slowObjectValue;
+@property (nonatomic, strong) id hookedObjectValue;
+// Called by -setHookedObjectValue:, if set, before it stores the value.
+@property (nonatomic, copy) void (^willSetHookedObjectValue)(void);
 
 // Returns a new object each time, with the integerValue set to 42.
 @property (nonatomic, copy, readonly) RACTestObject *dynamicObjectProperty;
