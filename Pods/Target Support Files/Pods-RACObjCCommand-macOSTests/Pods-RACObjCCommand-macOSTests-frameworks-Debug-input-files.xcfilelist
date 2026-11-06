@@ -1,0 +1,8 @@
+${PODS_ROOT}/Target Support Files/Pods-RACObjCCommand-macOSTests/Pods-RACObjCCommand-macOSTests-frameworks.sh
+${BUILT_PRODUCTS_DIR}/CwlCatchException-macOS/CwlCatchException.framework
+${BUILT_PRODUCTS_DIR}/CwlCatchExceptionSupport-macOS/CwlCatchExceptionSupport.framework
+${BUILT_PRODUCTS_DIR}/CwlMachBadInstructionHandler-macOS/CwlMachBadInstructionHandler.framework
+${BUILT_PRODUCTS_DIR}/CwlPosixPreconditionTesting-macOS/CwlPosixPreconditionTesting.framework
+${BUILT_PRODUCTS_DIR}/CwlPreconditionTesting-macOS/CwlPreconditionTesting.framework
+${BUILT_PRODUCTS_DIR}/Nimble-macOS/Nimble.framework
+${BUILT_PRODUCTS_DIR}/Quick-macOS/Quick.framework

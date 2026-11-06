@@ -1,0 +1,6 @@
+framework module CwlPreconditionTesting {
+  umbrella header "CwlPreconditionTesting-macOS-umbrella.h"
+
+  export *
+  module * { export * }
+}

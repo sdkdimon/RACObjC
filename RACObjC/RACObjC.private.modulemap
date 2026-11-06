@@ -1,0 +1,12 @@
+// The framework's private headers (the Private ones in the frameworks'
+// Headers build phase), as their own module next to RACObjC.
+framework module RACObjC_Private {
+    header "EXTRuntimeExtensions.h"
+    header "RACEmptySequence.h"
+    header "RACEmptySignal.h"
+    header "RACMulticastConnection+Private.h"
+    header "RACScheduler+Private.h"
+    header "RACStream+Private.h"
+    header "RACSubscriber+Private.h"
+    export *
+}

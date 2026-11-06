@@ -7,22 +7,21 @@ def test_pods
   pod 'Nimble'
 end
 
-target 'RACObjC-iOSTests' do
-  project 'Core/RACObjC.xcodeproj'
-  platform :ios, '12.0'
-  test_pods
-end
+# One test bundle per module and platform, e.g. RACObjCKVO-macOSTests.
+modules = %w[Core Deallocation KVO Command Swizzling Extras]
+platforms = {
+  'iOS' => [:ios, '15.0'],
+  'macOS' => [:osx, '14.0'],
+}
 
-target 'RACObjC-macOSTests' do
-  project 'Core/RACObjC.xcodeproj'
-  platform :osx, '10.15'
-  test_pods
-end
-
-target 'RACObjC-tvOSTests' do
-  project 'Core/RACObjC.xcodeproj'
-  platform :tvos, '9.0'
-  test_pods
+modules.each do |mod|
+  platforms.each do |name, (platform_name, version)|
+    target "RACObjC#{mod}-#{name}Tests" do
+      project 'RACObjC.xcodeproj'
+      platform platform_name, version
+      test_pods
+    end
+  end
 end
 
 post_install do |installer|
@@ -30,7 +29,6 @@ post_install do |installer|
     target.build_configurations.each do |config|
       config.build_settings['IPHONEOS_DEPLOYMENT_TARGET'] = '$(inherited)'
       config.build_settings['MACOSX_DEPLOYMENT_TARGET'] = '$(inherited)'
-      config.build_settings['TVOS_DEPLOYMENT_TARGET'] = '$(inherited)'
       config.build_settings['WATCHOS_DEPLOYMENT_TARGET'] = '$(inherited)'
     end
   end
