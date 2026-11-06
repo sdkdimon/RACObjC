@@ -13,7 +13,43 @@
 #import <objc/message.h>
 #import <objc/runtime.h>
 
+// GNUstep builds default to 0; see GNUstep/RACGNUstepPrefix.h.
+#ifndef RAC_USE_BLOCK_IMPS
+#define RAC_USE_BLOCK_IMPS 1
+#endif
+
+#if !RAC_USE_BLOCK_IMPS
+#import "RACSwizzleTable.h"
+#endif
+
 static const void *RACObjectCompoundDisposable = &RACObjectCompoundDisposable;
+
+#if !RAC_USE_BLOCK_IMPS
+// Every swizzled class's -dealloc. See RACSwizzleTable.h.
+static RACSwizzleTable RACDeallocTable;
+
+static void RACSwizzledDealloc(__unsafe_unretained id self, SEL _cmd) {
+	RACSwizzleEntry *entry = RACSwizzleTableEntryForCall(&RACDeallocTable, self, NULL);
+
+	RACCompoundDisposable *compoundDisposable = objc_getAssociatedObject(self, RACObjectCompoundDisposable);
+	[compoundDisposable dispose];
+
+	void (*originalDealloc)(__unsafe_unretained id, SEL) = (__typeof__(originalDealloc))atomic_load(&entry->original);
+	if (originalDealloc == NULL) {
+		// libobjc2 has no objc_msgSendSuper: look up the superclass IMP.
+		struct objc_super superInfo = { self, class_getSuperclass(entry->cls) };
+		originalDealloc = (__typeof__(originalDealloc))objc_msg_lookup_super(&superInfo, _cmd);
+	}
+
+	RACSwizzleFrame frame;
+	RACSwizzlePushFrame(&frame, &RACDeallocTable, entry, self, NULL);
+	@try {
+		originalDealloc(self, _cmd);
+	} @finally {
+		RACSwizzlePopFrame(&frame);
+	}
+}
+#endif
 
 static NSMutableSet *swizzledClasses(void) {
 	static dispatch_once_t onceToken;
@@ -32,6 +68,17 @@ static void swizzleDeallocIfNeeded(Class classToSwizzle) {
 
 		SEL deallocSelector = sel_registerName("dealloc");
 
+#if !RAC_USE_BLOCK_IMPS
+		RACSwizzleEntry *entry = RACSwizzleTableAdd(&RACDeallocTable, classToSwizzle, NULL, Nil);
+
+		if (!class_addMethod(classToSwizzle, deallocSelector, (IMP)RACSwizzledDealloc, "v@:")) {
+			// The class already contains a method implementation. Store it
+			// before and after replacing it, as below.
+			Method deallocMethod = class_getInstanceMethod(classToSwizzle, deallocSelector);
+			atomic_store(&entry->original, method_getImplementation(deallocMethod));
+			atomic_store(&entry->original, method_setImplementation(deallocMethod, (IMP)RACSwizzledDealloc));
+		}
+#else
 		__block void (*originalDealloc)(__unsafe_unretained id, SEL) = NULL;
 
 		id newDealloc = ^(__unsafe_unretained id self) {
@@ -72,6 +119,7 @@ static void swizzleDeallocIfNeeded(Class classToSwizzle) {
 			// We need to store original implementation again, in case it just changed.
 			originalDealloc = (__typeof__(originalDealloc))method_setImplementation(deallocMethod, newDeallocIMP);
 		}
+#endif
 
 		[swizzledClasses() addObject:className];
 	}

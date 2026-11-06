@@ -5,3 +5,5 @@ xcuserdata
 Core/RACObjC/obj/
 Core/RACObjC/derived_src/
 Core/RACObjC/GNUstep/Tests/obj/
+Core/RACObjC/GNUstep/Tests/derived_src/
+Core/RACObjC/GNUstep/Tests/RACObjCSpecs.bundle/

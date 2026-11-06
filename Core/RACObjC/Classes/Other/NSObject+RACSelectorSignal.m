@@ -26,6 +26,15 @@ extern void RACObjCMsgForward(void);
 #define RACMsgForwardIMP _objc_msgForward
 #endif
 
+// GNUstep builds default to 0; see GNUstep/RACGNUstepPrefix.h.
+#ifndef RAC_USE_BLOCK_IMPS
+#define RAC_USE_BLOCK_IMPS 1
+#endif
+
+#if !RAC_USE_BLOCK_IMPS
+#import "RACSwizzleTable.h"
+#endif
+
 NSErrorDomain const RACSelectorSignalErrorDomain = @"RACSelectorSignalErrorDomain";
 
 static NSString * const RACSignalForSelectorAliasPrefix = @"rac_alias_";
@@ -58,9 +67,104 @@ static BOOL RACForwardInvocation(id self, NSInvocation *invocation) {
 
 	if (subject == nil) return respondsToAlias;
 
+#ifdef GNUSTEP
+	// Apple's runtime hands -forwardInvocation: an invocation with a zeroed
+	// return value; gnustep-base doesn't, so a method only the signal
+	// implements would return whatever was in that memory.
+	NSUInteger returnLength = invocation.methodSignature.methodReturnLength;
+	if (!respondsToAlias && returnLength > 0) {
+		void *zero = calloc(1, returnLength);
+		[invocation setReturnValue:zero];
+		free(zero);
+	}
+#endif
+
 	[subject sendNext:invocation.rac_argumentsTuple];
 	return YES;
 }
+
+#if !RAC_USE_BLOCK_IMPS
+// The swizzled methods as plain functions, each with a table of the classes
+// it's installed on. See GNUstep/RACSwizzleTable.h. They do what the blocks
+// below do.
+static RACSwizzleTable RACForwardInvocationTable;
+static RACSwizzleTable RACRespondsToSelectorTable;
+static RACSwizzleTable RACGetClassTable;
+static RACSwizzleTable RACMethodSignatureForSelectorTable;
+
+static void RACSwizzledForwardInvocation(id self, SEL _cmd, NSInvocation *invocation) {
+	const void *argument = (__bridge const void *)invocation;
+	RACSwizzleEntry *entry = RACSwizzleTableEntryForCall(&RACForwardInvocationTable, self, argument);
+
+	BOOL matched = RACForwardInvocation(self, invocation);
+	if (matched) return;
+
+	void (*originalForwardInvocation)(id, SEL, NSInvocation *) = (__typeof__(originalForwardInvocation))atomic_load(&entry->original);
+	if (originalForwardInvocation == NULL) {
+		[self doesNotRecognizeSelector:invocation.selector];
+		return;
+	}
+
+	RACSwizzleFrame frame;
+	RACSwizzlePushFrame(&frame, &RACForwardInvocationTable, entry, self, argument);
+	@try {
+		originalForwardInvocation(self, _cmd, invocation);
+	} @finally {
+		RACSwizzlePopFrame(&frame);
+	}
+}
+
+static BOOL RACSwizzledRespondsToSelector(id self, SEL _cmd, SEL selector) {
+	RACSwizzleEntry *entry = RACSwizzleTableEntryForCall(&RACRespondsToSelectorTable, self, selector);
+
+	Method method = rac_getImmediateInstanceMethod(entry->cls, selector);
+	if (method != NULL && method_getImplementation(method) == RACMsgForwardIMP) {
+		SEL aliasSelector = RACAliasForSelector(selector);
+		if (objc_getAssociatedObject(self, aliasSelector) != nil) return YES;
+	}
+
+	BOOL (*originalRespondsToSelector)(id, SEL, SEL) = (__typeof__(originalRespondsToSelector))atomic_load(&entry->original);
+	RACSwizzleFrame frame;
+	RACSwizzlePushFrame(&frame, &RACRespondsToSelectorTable, entry, self, selector);
+	@try {
+		return originalRespondsToSelector(self, _cmd, selector);
+	} @finally {
+		RACSwizzlePopFrame(&frame);
+	}
+}
+
+static Class RACSwizzledGetClass(id self, SEL _cmd) {
+	return RACSwizzleTableEntryForCall(&RACGetClassTable, self, NULL)->statedClass;
+}
+
+static NSMethodSignature *RACSwizzledMethodSignatureForSelector(id self, SEL _cmd, SEL selector) {
+	RACSwizzleEntry *entry = RACSwizzleTableEntryForCall(&RACMethodSignatureForSelectorTable, self, selector);
+
+	// Don't send the -class message to the receiver because we've changed
+	// that to return the original class.
+	Class actualClass = object_getClass(self);
+	Method method = class_getInstanceMethod(actualClass, selector);
+	if (method == NULL) {
+		// Messages that the original class dynamically implements fall here.
+		//
+		// Call the original class' -methodSignatureForSelector:. libobjc2 has
+		// no objc_msgSendSuper: look up the superclass IMP and call it.
+		struct objc_super target = { self, class_getSuperclass(entry->cls) };
+		NSMethodSignature * (*superIMP)(id, SEL, SEL) = (__typeof__(superIMP))objc_msg_lookup_super(&target, _cmd);
+
+		RACSwizzleFrame frame;
+		RACSwizzlePushFrame(&frame, &RACMethodSignatureForSelectorTable, entry, self, selector);
+		@try {
+			return superIMP(self, _cmd, selector);
+		} @finally {
+			RACSwizzlePopFrame(&frame);
+		}
+	}
+
+	char const *encoding = method_getTypeEncoding(method);
+	return [NSMethodSignature signatureWithObjCTypes:encoding];
+}
+#endif
 
 static void RACSwizzleForwardInvocation(Class class) {
 	SEL forwardInvocationSEL = @selector(forwardInvocation:);
@@ -72,6 +176,10 @@ static void RACSwizzleForwardInvocation(Class class) {
 		originalForwardInvocation = (__typeof__(originalForwardInvocation))method_getImplementation(forwardInvocationMethod);
 	}
 
+#if !RAC_USE_BLOCK_IMPS
+	RACSwizzleTableAdd(&RACForwardInvocationTable, class, (IMP)originalForwardInvocation, Nil);
+	class_replaceMethod(class, forwardInvocationSEL, (IMP)RACSwizzledForwardInvocation, "v@:@");
+#else
 	// Set up a new version of -forwardInvocation:.
 	//
 	// If the selector has been passed to -rac_signalForSelector:, invoke
@@ -93,6 +201,7 @@ static void RACSwizzleForwardInvocation(Class class) {
 	};
 
 	class_replaceMethod(class, forwardInvocationSEL, imp_implementationWithBlock(newForwardInvocation), "v@:@");
+#endif
 }
 
 static void RACSwizzleRespondsToSelector(Class class) {
@@ -102,6 +211,10 @@ static void RACSwizzleRespondsToSelector(Class class) {
 	Method respondsToSelectorMethod = class_getInstanceMethod(class, respondsToSelectorSEL);
 	BOOL (*originalRespondsToSelector)(id, SEL, SEL) = (__typeof__(originalRespondsToSelector))method_getImplementation(respondsToSelectorMethod);
 
+#if !RAC_USE_BLOCK_IMPS
+	RACSwizzleTableAdd(&RACRespondsToSelectorTable, class, (IMP)originalRespondsToSelector, Nil);
+	class_replaceMethod(class, respondsToSelectorSEL, (IMP)RACSwizzledRespondsToSelector, method_getTypeEncoding(respondsToSelectorMethod));
+#else
 	// Set up a new version of -respondsToSelector: that returns YES for methods
 	// added by -rac_signalForSelector:.
 	//
@@ -121,18 +234,28 @@ static void RACSwizzleRespondsToSelector(Class class) {
 	};
 
 	class_replaceMethod(class, respondsToSelectorSEL, imp_implementationWithBlock(newRespondsToSelector), method_getTypeEncoding(respondsToSelectorMethod));
+#endif
 }
 
 static void RACSwizzleGetClass(Class class, Class statedClass) {
 	SEL selector = @selector(class);
 	Method method = class_getInstanceMethod(class, selector);
+#if !RAC_USE_BLOCK_IMPS
+	RACSwizzleTableAdd(&RACGetClassTable, class, NULL, statedClass);
+	IMP newIMP = (IMP)RACSwizzledGetClass;
+#else
 	IMP newIMP = imp_implementationWithBlock(^(id self) {
 		return statedClass;
 	});
+#endif
 	class_replaceMethod(class, selector, newIMP, method_getTypeEncoding(method));
 }
 
 static void RACSwizzleMethodSignatureForSelector(Class class) {
+#if !RAC_USE_BLOCK_IMPS
+	RACSwizzleTableAdd(&RACMethodSignatureForSelectorTable, class, NULL, Nil);
+	IMP newIMP = (IMP)RACSwizzledMethodSignatureForSelector;
+#else
 	IMP newIMP = imp_implementationWithBlock(^(id self, SEL selector) {
 		// Don't send the -class message to the receiver because we've changed
 		// that to return the original class.
@@ -162,6 +285,7 @@ static void RACSwizzleMethodSignatureForSelector(Class class) {
 		char const *encoding = method_getTypeEncoding(method);
 		return [NSMethodSignature signatureWithObjCTypes:encoding];
 	});
+#endif
 
 	SEL selector = @selector(methodSignatureForSelector:);
 	Method methodSignatureForSelectorMethod = class_getInstanceMethod(class, selector);

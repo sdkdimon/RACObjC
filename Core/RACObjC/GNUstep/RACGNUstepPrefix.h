@@ -12,6 +12,16 @@
 #ifndef RAC_GNUSTEP_PREFIX_H
 #define RAC_GNUSTEP_PREFIX_H
 
+// libobjc2 has no imp_implementationWithBlock() unless it's built with its
+// embedded blocks runtime (gnustep/libobjc2#355), and it hands out only 128
+// (aarch64) or 256 (x86_64) block IMPs per process (gnustep/libobjc2#438).
+// Until both are fixed, the methods RACObjC swizzles are plain functions on
+// GNUstep (RACSwizzleTable.h). Build with -DRAC_USE_BLOCK_IMPS=1 to use block
+// IMPs, as on Apple platforms.
+#ifndef RAC_USE_BLOCK_IMPS
+#define RAC_USE_BLOCK_IMPS 0
+#endif
+
 #ifdef __OBJC__
 
 #import <Foundation/Foundation.h>

@@ -45,12 +45,15 @@ jobs:
       run:
         shell: bash
     env:
-      # GNUstep stack: libobjc2, libdispatch, gnustep-make, gnustep-base, all built with clang.
-      # Changing a version changes the cache key, so the stack is rebuilt.
+      # GNUstep stack: libobjc2, libdispatch, gnustep-make, gnustep-base and
+      # tools-xctest, all built with clang. Changing a version changes the
+      # cache key, so the stack is rebuilt.
       LIBOBJC2_REF: v2.3
       LIBDISPATCH_REF: swift-6.4.2-RELEASE
       TOOLS_MAKE_REF: make-2_9_3
       LIBS_BASE_REF: base-1_31_1
+      # tools-xctest's last release (v0.1.1) is from 2023; this is its master of 2026-10-05.
+      TOOLS_XCTEST_REF: 5c84fc34da8275739dd2e26f9deb7bb0845ca2e1
       # Ubuntu's clang 18. GitHub's images also carry a Swift toolchain with
       # its own clang, so name the compiler by path.
       CC: /usr/bin/clang
@@ -71,7 +74,7 @@ jobs:
         uses: actions/cache/restore@v6
         with:
           path: ~/gnustep-stack
-          key: gnustep-${{ matrix.os }}-${{ env.LIBOBJC2_REF }}-${{ env.LIBDISPATCH_REF }}-${{ env.TOOLS_MAKE_REF }}-${{ env.LIBS_BASE_REF }}-v1
+          key: gnustep-${{ matrix.os }}-${{ env.LIBOBJC2_REF }}-${{ env.LIBDISPATCH_REF }}-${{ env.TOOLS_MAKE_REF }}-${{ env.LIBS_BASE_REF }}-${{ env.TOOLS_XCTEST_REF }}-v1
 
       # Each component installs into ~/gnustep-stack (DESTDIR), which is then
       # copied into / so the next component builds against it. A cache hit
@@ -109,8 +112,15 @@ jobs:
           sudo -E make -C libs-base install DESTDIR="$STAGE"
           publish
 
-      # Saved right after the build, so a failing smoke test doesn't throw
-      # the built stack away.
+          git init -q tools-xctest
+          git -C tools-xctest fetch -q --depth 1 https://github.com/gnustep/tools-xctest "$TOOLS_XCTEST_REF"
+          git -C tools-xctest checkout -q FETCH_HEAD
+          make -C tools-xctest -j"$(nproc)"
+          sudo -E make -C tools-xctest install DESTDIR="$STAGE"
+          publish
+
+      # Saved right after the build, so a failing test doesn't throw the built
+      # stack away.
       - name: Save GNUstep stack
         if: steps.stack.outputs.cache-hit != 'true'
         uses: actions/cache/save@v6
@@ -131,7 +141,9 @@ jobs:
           grep GS_USE_LIBDISPATCH_RUNLOOP "$config"
           grep -q 'GS_USE_LIBDISPATCH_RUNLOOP 1' "$config"
 
-      - name: Smoke tests
+      # The smoke tests, then the specs in Core/RACObjCTests on tools-xctest.
+      # Core/RACObjC/GNUstep/Tests/KnownFailures.md lists the specs expected to fail.
+      - name: Tests
         run: |
           . /usr/local/share/GNUstep/Makefiles/GNUstep.sh
           make -C Core/RACObjC check

@@ -25,7 +25,8 @@ RAC_INCLUDE_DIR = derived_src/include
 
 libRACObjC_OBJC_FILES = $(RAC_SOURCES) \
 	GNUstep/RACCFShims.m \
-	GNUstep/RACObjCVersion.m
+	GNUstep/RACObjCVersion.m \
+	GNUstep/RACSwizzleTable.m
 libRACObjC_C_FILES = GNUstep/RACObjCMsgForward.c
 
 libRACObjC_HEADER_FILES_DIR = $(RAC_INCLUDE_DIR)/RACObjC
@@ -35,7 +36,7 @@ libRACObjC_HEADER_FILES_INSTALL_DIR = RACObjC
 libRACObjC_LIBRARIES_DEPEND_UPON += -ldispatch $(FND_LIBS) $(OBJC_LIBS)
 
 ADDITIONAL_OBJCFLAGS += -fobjc-arc -fblocks -include GNUstep/RACGNUstepPrefix.h
-ADDITIONAL_INCLUDE_DIRS += -IGNUstep/shim -I$(RAC_INCLUDE_DIR) -I$(RAC_INCLUDE_DIR)/RACObjC
+ADDITIONAL_INCLUDE_DIRS += -IGNUstep -IGNUstep/shim -I$(RAC_INCLUDE_DIR) -I$(RAC_INCLUDE_DIR)/RACObjC
 
 include $(GNUSTEP_MAKEFILES)/library.make
 

@@ -11,6 +11,7 @@
 
 #import <Foundation/Foundation.h>
 #import <RACObjC/RACObjC.h>
+#import <objc/runtime.h>
 
 static NSUInteger RSTPassed = 0;
 static NSUInteger RSTFailed = 0;
@@ -66,6 +67,7 @@ static BOOL RSTWaitUntil(NSTimeInterval timeout, BOOL (^condition)(void)) {
 @end
 
 static BOOL RSTTrackerDeallocRan = NO;
+static volatile BOOL RSTThreadExited = NO;
 
 // Implements -dealloc itself, so RAC has to wrap an existing implementation.
 @interface RSTDeallocTracker : NSObject
@@ -319,6 +321,74 @@ static BOOL RSTTrackerDeallocRan = NO;
 	CHECK([lifted isEqual:@"Ada Lovelace"], "rac_liftSelector:withSignals:");
 }
 
+// libobjc2 hands out only 128 (aarch64) or 256 (x86_64) block IMPs, so
+// swizzling with them would crash here; RACObjC uses plain functions on
+// GNUstep (GNUstep/RACSwizzleTable.h).
+- (void)testManySwizzledClasses {
+	puts("many swizzled classes");
+
+	const NSUInteger count = 300;
+	__block NSUInteger deallocated = 0;
+	__block NSUInteger forwarded = 0;
+	NSUInteger returned = 0;
+	for (NSUInteger i = 0; i < count; i++) {
+		@autoreleasepool {
+			NSString *name = [NSString stringWithFormat:@"RSTGeneratedPerson%lu", (unsigned long)i];
+			Class cls = objc_allocateClassPair(RSTPerson.class, name.UTF8String, 0);
+			objc_registerClassPair(cls);
+
+			// Separate objects: one with -rac_signalForSelector: on a class
+			// made at runtime isn't deallocated on GNUstep, with block IMPs
+			// too (not investigated yet).
+			RSTPerson *person = [cls new];
+			[person.rac_willDeallocSignal subscribeCompleted:^{ deallocated++; }];
+
+			RSTPerson *signalPerson = [cls new];
+			[[signalPerson rac_signalForSelector:@selector(addInt:toInt:)] subscribeNext:^(RACTuple *args) { forwarded++; }];
+			if ([signalPerson addInt:2 toInt:3] == 5 && signalPerson.class == cls) returned++;
+		}
+	}
+	CHECK(deallocated == count, "rac_willDeallocSignal on 300 classes");
+	CHECK(forwarded == count && returned == count, "rac_signalForSelector: on 300 classes");
+
+	// A subclass and its superclass both swizzled: the subclass's -dealloc
+	// has to reach the superclass's swizzled -dealloc, and that one the
+	// superclass's own -dealloc.
+	Class subclass = objc_allocateClassPair(RSTDeallocTracker.class, "RSTGeneratedTrackerSubclass", 0);
+	objc_registerClassPair(subclass);
+	@autoreleasepool {
+		[[RSTDeallocTracker new] rac_willDeallocSignal];
+	}
+	__block BOOL subclassCompleted = NO;
+	RSTTrackerDeallocRan = NO;
+	@autoreleasepool {
+		id tracker = [subclass new];
+		[[tracker rac_willDeallocSignal] subscribeCompleted:^{ subclassCompleted = YES; }];
+	}
+	CHECK(subclassCompleted && RSTTrackerDeallocRan, "swizzled -dealloc on a subclass of a swizzled class");
+
+	// On a plain NSObject, this swizzles NSObject's own -dealloc, which every
+	// object then goes through, including the autorelease pools a thread
+	// frees when it exits (NSAutoreleasePool raises if it's retained).
+	__block BOOL objectCompleted = NO;
+	@autoreleasepool {
+		NSObject *object = [NSObject new];
+		[object.rac_willDeallocSignal subscribeCompleted:^{ objectCompleted = YES; }];
+	}
+	RSTThreadExited = NO;
+	[NSThread detachNewThreadSelector:@selector(runShortThread) toTarget:self withObject:nil];
+	BOOL threadExited = RSTWaitUntil(5, ^{ return RSTThreadExited; });
+	[NSThread sleepForTimeInterval:0.2];
+	CHECK(objectCompleted && threadExited, "swizzled -[NSObject dealloc], then a thread exits");
+}
+
+- (void)runShortThread {
+	@autoreleasepool {
+		(void)[[NSObject new] description];
+	}
+	RSTThreadExited = YES;
+}
+
 - (void)testDeallocation {
 	puts("deallocation");
 
@@ -392,7 +462,8 @@ static BOOL RSTTrackerDeallocRan = NO;
 	SEL tests[] = {
 		@selector(testSignalBasics), @selector(testSubjects), @selector(testSequences),
 		@selector(testDisposables), @selector(testSchedulers), @selector(testKVO),
-		@selector(testSelectorSignals), @selector(testDeallocation), @selector(testCommandsAndFoundation),
+		@selector(testSelectorSignals), @selector(testDeallocation), @selector(testManySwizzledClasses),
+		@selector(testCommandsAndFoundation),
 	};
 	for (size_t i = 0; i < sizeof(tests) / sizeof(tests[0]); i++) {
 		@try {
